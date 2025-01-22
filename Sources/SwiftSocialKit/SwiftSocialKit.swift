@@ -26,18 +26,12 @@ public class SwiftSocialKit {
 
 @MainActor
 public struct ShareContent {
-    public var image: UIImage
+    public var view: any View
     public var imageFrame: CGSize?
-    public var background: Any?
+    public var background: (any View)?
     
-    public init(image: UIImage, frame: CGSize? = nil, background: Any? = nil) {
-        self.image = image
-        self.imageFrame = frame
-        self.background = background
-    }
-    
-    public init(view: UIView, frame: CGSize? = nil, background: Any? = nil) {
-        self.image = view.snapshot(frameSize: frame)
+    public init(view: any View, frame: CGSize? = nil, background: (any View)? = nil) {
+        self.view = view
         self.imageFrame = frame
         self.background = background
     }
@@ -65,11 +59,15 @@ class InstagramShare {
         var backgroundData: Data?
         
         if let frame = content.imageFrame {
-            let framedImage = applyFrameToImage(image: content.image, frameSize: frame)
-            imageData = framedImage.pngData()
+            if content.view is Text {
+                imageData = content.view.frame(width: frame.width, height: frame.height).snapshot().pngData()
+            } else {
+                imageData = content.view.snapshot().resizeWithAspectRatio(to: frame)?.pngData()
+            }
         } else {
-            imageData = content.image.pngData()
+            imageData = content.view.snapshot().pngData()
         }
+      
         if let background = content.background {
             backgroundData = convertBackgroundToData(background: background)
         }
@@ -98,63 +96,24 @@ class InstagramShare {
 }
 
 @MainActor
-func convertBackgroundToData(background: Any) -> Data? {
-    if let backgroundImage = background as? UIImage {
-        return backgroundImage.pngData() // Or .jpegData(compressionQuality: 1.0)
-    } else if let backgroundView = background as? UIView {
-        let snapshotImage = backgroundView.snapshot()
-        return snapshotImage.pngData() // Or .jpegData(compressionQuality: 1.0)
-    }
-    return nil
+func convertBackgroundToData(background: any View) -> Data? {
+    return background.snapshot().pngData()
 }
 
-@MainActor
-func applyFrameToImage(image: UIImage, frameSize: CGSize) -> UIImage {
-    UIGraphicsBeginImageContextWithOptions(frameSize, false, image.scale)
-    defer { UIGraphicsEndImageContext() }
+extension View {
     
-    let context = UIGraphicsGetCurrentContext()
-    context?.setStrokeColor(UIColor.black.cgColor)
-    context?.setLineWidth(5)
-    
-    // Draw the image inside the frame
-    image.draw(in: CGRect(origin: .zero, size: frameSize))
-    
-    // Draw the frame
-    context?.stroke(CGRect(origin: .zero, size: frameSize))
-    
-    return UIGraphicsGetImageFromCurrentImageContext() ?? image
-}
-
-
-
-
-extension UIView {
-    func snapshot(frameSize: CGSize? = nil) -> UIImage {
-        let targetSize: CGSize
+    func snapshot() -> UIImage {
+        let controller = UIHostingController(rootView: self)
+        let view = controller.view
         
-        if let frameSize = frameSize {
-            targetSize = frameSize
-            self.frame = CGRect(origin: .zero, size: targetSize)
-        } else {
-            // Important: Ensure we have a non-zero size for the view
-            let size = self.frame.size
-            guard size.width > 0, size.height > 0 else {
-                // If view has no size, use a default reasonable size
-                targetSize = CGSize(width: 300, height: 300)
-                self.frame = CGRect(origin: .zero, size: targetSize)
-                return self.snapshot(frameSize: targetSize)
-            }
-            
-            // Use view's intrinsic size as the base
-            targetSize = size
-        }
-        
-        self.layoutIfNeeded()
+        let targetSize = controller.view.intrinsicContentSize
+        view?.bounds = CGRect(origin: .zero, size: targetSize)
+        view?.backgroundColor = .clear
         
         let renderer = UIGraphicsImageRenderer(size: targetSize)
-        return renderer.image { context in
-            self.drawHierarchy(in: CGRect(origin: .zero, size: targetSize), afterScreenUpdates: true)
+        
+        return renderer.image { _ in
+            view?.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
         }
     }
 }
