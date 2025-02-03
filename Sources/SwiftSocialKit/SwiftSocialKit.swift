@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 import SwiftUI
-
+ 
 @MainActor
 public class SwiftSocialKit {
     public func configureMeta(appID: String) {
