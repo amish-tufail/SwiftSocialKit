@@ -10,7 +10,7 @@ import Foundation
 @MainActor
 internal class GlobalConfig {
     
-     static let shared = GlobalConfig()
+    static let shared = GlobalConfig()
 
     private var metaAppID: String?
 
