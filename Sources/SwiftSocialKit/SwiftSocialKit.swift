@@ -18,8 +18,16 @@ public class SwiftSocialKit {
     public init() {}
     
     @MainActor public func shareToInstagramStories(storyContent: ShareContent, completion: @escaping (Bool) -> ()) {
-        InstagramShare(content: storyContent).shareToStories { success in
-            completion(success)
+//        InstagramShare(content: storyContent).shareToStories { success in
+//            completion(success)
+//        }
+        InstagramShare(content: storyContent).shareToStories { result in
+            switch result {
+            case .success:
+                completion(true)
+            case .failure:
+                completion(false)
+            }
         }
     }
 }
