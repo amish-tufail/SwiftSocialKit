@@ -18,7 +18,7 @@ class InstagramShare {
             return
         }
         
-        let urlScheme = URL(string: "\(Constants.InstagramURLs.instagramURLStoryScheme)(appID)")!
+        let urlScheme = URL(string: "\(Constants.InstagramURLs.urlStoryScheme)(appID)")!
         
         var imageData: Data?
         var backgroundData: Data?
@@ -39,16 +39,16 @@ class InstagramShare {
         
         if UIApplication.shared.canOpenURL(urlScheme), let imageData = imageData {
             var pasteboardItems: [String: Any] = [
-                Constants.InstaFBCommonURls.instagramStickerURL: imageData
+                Constants.InstaFBCommonURls.stickerURL: imageData
             ]
             
             if let backgroundData = backgroundData {
-                pasteboardItems[Constants.InstaFBCommonURls.instagramBackroundImageURL] = backgroundData
+                pasteboardItems[Constants.InstaFBCommonURls.backroundImageURL] = backgroundData
             } else {
                 if content.dynamicBackground {
                     let (topColor, bottomColor) = content.view.snapshot().getDominantColors()
-                    pasteboardItems[Constants.InstaFBCommonURls.instagramBackroundTopColorURL] =  topColor
-                    pasteboardItems[ Constants.InstaFBCommonURls.instagramBackroundBottomColorURL] = bottomColor
+                    pasteboardItems[Constants.InstaFBCommonURls.backroundTopColorURL] =  topColor
+                    pasteboardItems[ Constants.InstaFBCommonURls.backgroundBottomColorURL] = bottomColor
                 } else if content.videoBackground != nil {
                     guard let video = content.videoBackground else { return }
                     guard let backgroundVideoData = try? Data(contentsOf: video) else {
@@ -56,7 +56,7 @@ class InstagramShare {
                         return
                     }
                     
-                    pasteboardItems["com.instagram.sharedSticker.backgroundVideo"] = backgroundVideoData
+                    pasteboardItems[Constants.InstaFBCommonURls.backgroundVideoURL] = backgroundVideoData
                 }
             }
             
