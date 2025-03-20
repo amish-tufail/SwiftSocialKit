@@ -24,29 +24,12 @@ public class SwiftSocialKit {
     }
 }
 
-@MainActor
-public struct ShareContent {
-    public var view: any View
-    public var imageFrame: CGSize?
-    public var background: (any View)?
-    public var dynamicBackground: Bool
-    
-    public init(view: any View, frame: CGSize? = nil, background: (any View)? = nil, dynamicBackground: Bool = false) {
-        self.view = view
-        self.imageFrame = frame
-        self.background = background
-        self.dynamicBackground = dynamicBackground
-    }
-}
 
 
 
 
 
-@MainActor
-func convertBackgroundToData(background: any View) -> Data? {
-    return background.snapshot().pngData()
-}
+
 
 
 

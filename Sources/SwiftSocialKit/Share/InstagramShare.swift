@@ -18,7 +18,7 @@ class InstagramShare {
             return
         }
         
-        let urlScheme = URL(string: "\(Constants.InstagramURLs.instagramURLScheme)(appID)")!
+        let urlScheme = URL(string: "\(Constants.InstagramURLs.instagramURLStoryScheme)(appID)")!
         
         var imageData: Data?
         var backgroundData: Data?
@@ -34,21 +34,29 @@ class InstagramShare {
         }
       
         if let background = content.background {
-            backgroundData = convertBackgroundToData(background: background)
+            backgroundData = background.convertBackgroundToData()
         }
         
         if UIApplication.shared.canOpenURL(urlScheme), let imageData = imageData {
             var pasteboardItems: [String: Any] = [
-                Constants.InstagramURLs.instagramStickerURL: imageData
+                Constants.InstaFBCommonURls.instagramStickerURL: imageData
             ]
             
             if let backgroundData = backgroundData {
-                pasteboardItems[Constants.InstagramURLs.instagramBackroundImageURL] = backgroundData
+                pasteboardItems[Constants.InstaFBCommonURls.instagramBackroundImageURL] = backgroundData
             } else {
                 if content.dynamicBackground {
                     let (topColor, bottomColor) = content.view.snapshot().getDominantColors()
-                    pasteboardItems[Constants.InstagramURLs.instagramBackroundTopColorURL] =  topColor
-                    pasteboardItems[ Constants.InstagramURLs.instagramBackroundBottomColorURL] = bottomColor
+                    pasteboardItems[Constants.InstaFBCommonURls.instagramBackroundTopColorURL] =  topColor
+                    pasteboardItems[ Constants.InstaFBCommonURls.instagramBackroundBottomColorURL] = bottomColor
+                } else if content.videoBackground != nil {
+                    guard let video = content.videoBackground else { return }
+                    guard let backgroundVideoData = try? Data(contentsOf: video) else {
+                        print("Failed to load merged video.")
+                        return
+                    }
+                    
+                    pasteboardItems["com.instagram.sharedSticker.backgroundVideo"] = backgroundVideoData
                 }
             }
             

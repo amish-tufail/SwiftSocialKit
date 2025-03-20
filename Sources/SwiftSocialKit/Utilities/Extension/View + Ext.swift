@@ -22,4 +22,9 @@ extension View {
             view?.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
         }
     }
+    
+    @MainActor
+    func convertBackgroundToData() -> Data? {
+        return self.snapshot().pngData()
+    }
 }
