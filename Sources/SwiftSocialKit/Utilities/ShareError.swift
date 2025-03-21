@@ -13,6 +13,7 @@ public enum ShareError: Error {
      case imageProcessingFailed
      case videoProcessingFailed
      case backgroundProcessingFailed
+    case invalidContentForReels
      
      public var localizedDescription: String {
          switch self {
@@ -26,6 +27,8 @@ public enum ShareError: Error {
              return "Failed to process the video background"
          case .backgroundProcessingFailed:
              return "Failed to process the background"
+         case .invalidContentForReels:
+             return "Instagram Reels only supports video background. Other background options are not supported."
          }
      }
  }

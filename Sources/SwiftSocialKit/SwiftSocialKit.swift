@@ -17,26 +17,13 @@ public class SwiftSocialKit {
     
     public init() {}
     
-     public func shareToInstagramStories(storyContent: ShareContent, completion: @escaping (Bool) -> ()) {
-//        InstagramShare(content: storyContent).shareToStories { success in
-//            completion(success)
-//        }
-        InstagramShare(content: storyContent).shareToStories { result in
+    public func shareToInstagram(destination: InstagramShareDestination, storyContent: ShareContent, completion: @escaping (Bool) -> ()) {
+        InstagramShare(content: storyContent).share(destination: destination) { result in
             switch result {
             case .success:
                 completion(true)
-            case .failure:
-                completion(false)
-            }
-        }
-    }
-    
-    public func shareToInstagramReels(storyContent: ShareContent, completion: @escaping (Bool) -> ()) {
-        InstagramShare(content: storyContent).shareToReels { result in
-            switch result {
-            case .success:
-                completion(true)
-            case .failure:
+            case .failure(let error):
+                print(error.localizedDescription)
                 completion(false)
             }
         }
