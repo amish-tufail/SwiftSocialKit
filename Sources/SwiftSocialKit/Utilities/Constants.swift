@@ -19,6 +19,7 @@ struct Constants {
     }
     
     struct InstaFBCommonURls {
+        static let appIdURL = "com.instagram.sharedSticker.appID"
         static let stickerURL = "com.instagram.sharedSticker.stickerImage"
         static let backroundImageURL = "com.instagram.sharedSticker.backgroundImage"
         static let backroundTopColorURL = "com.instagram.sharedSticker.backgroundTopColor"

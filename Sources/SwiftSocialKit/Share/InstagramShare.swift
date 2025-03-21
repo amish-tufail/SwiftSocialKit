@@ -23,6 +23,7 @@ import SwiftUI
              }
              
              let urlScheme = try createInstagramStoryURL(appID: appID)
+             
              guard UIApplication.shared.canOpenURL(urlScheme) else {
                  throw ShareError.cannotOpenInstagram
              }
@@ -32,7 +33,43 @@ import SwiftUI
              }
              
              var pasteboardItems: [String: Any] = [
-                 Constants.InstaFBCommonURls.stickerURL: imageData
+                 Constants.InstaFBCommonURls.stickerURL: imageData,
+                 Constants.InstaFBCommonURls.appIdURL : appID
+             ]
+             
+             if let backgroundItems = try? prepareBackgroundItems() {
+                 pasteboardItems.merge(backgroundItems) { (_, new) in new }
+             }
+             
+             shareToInstagram(urlScheme: urlScheme, items: pasteboardItems)
+             completion(.success(()))
+         } catch let error as ShareError {
+             completion(.failure(error))
+         } catch {
+             completion(.failure(.cannotOpenInstagram))
+         }
+     }
+     
+     @MainActor
+     public func shareToReels(completion: @escaping (Result<Void, ShareError>) -> Void) {
+         do {
+             guard let appID = GlobalConfig.getMetaAppID() else {
+                 throw ShareError.missingAppID
+             }
+             
+             let urlScheme = try createInstagramReelsURL(appID: appID)
+             
+             guard UIApplication.shared.canOpenURL(urlScheme) else {
+                 throw ShareError.cannotOpenInstagram
+             }
+             
+             guard let imageData = try prepareImageData() else {
+                 throw ShareError.imageProcessingFailed
+             }
+             
+             var pasteboardItems: [String: Any] = [
+                 Constants.InstaFBCommonURls.stickerURL: imageData,
+                 Constants.InstaFBCommonURls.appIdURL : appID
              ]
              
              if let backgroundItems = try? prepareBackgroundItems() {
@@ -52,6 +89,13 @@ import SwiftUI
      
      private func createInstagramStoryURL(appID: String) throws -> URL {
          guard let url = URL(string: "\(Constants.InstagramURLs.urlStoryScheme)\(appID)") else {
+             throw ShareError.cannotOpenInstagram
+         }
+         return url
+     }
+     
+     private func createInstagramReelsURL(appID: String) throws -> URL {
+         guard let url = URL(string: "\(Constants.InstagramURLs.urlReelScheme)\(appID)") else {
              throw ShareError.cannotOpenInstagram
          }
          return url
