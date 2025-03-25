@@ -28,7 +28,7 @@ import SwiftUI
              let urlScheme = try destination.createURL(appID: appID)
              
              guard UIApplication.shared.canOpenURL(urlScheme) else {
-                 throw ShareError.cannotOpenInstagram
+                 throw ShareError.cannotOpenApp
              }
              
              guard let imageData = try prepareImageData() else {
@@ -36,8 +36,8 @@ import SwiftUI
              }
              
              var pasteboardItems: [String: Any] = [
-                Constants.InstaFBCommonURls.stickerURL : imageData,
-                Constants.InstaFBCommonURls.appIdURL : appID
+                Constants.InstagramURLs.stickerURL : imageData,
+                Constants.InstagramURLs.appIdURL : appID
              ]
              
              if let backgroundItems = try? prepareBackgroundItems() {
@@ -49,7 +49,7 @@ import SwiftUI
          } catch let error as ShareError {
              completion(.failure(error))
          } catch {
-             completion(.failure(.cannotOpenInstagram))
+             completion(.failure(.cannotOpenApp))
          }
      }
      
@@ -86,19 +86,19 @@ import SwiftUI
              guard let backgroundData = background.convertBackgroundToData() else {
                  throw ShareError.backgroundProcessingFailed
              }
-             return [Constants.InstaFBCommonURls.backroundImageURL: backgroundData]
+             return [Constants.InstagramURLs.backroundImageURL: backgroundData]
          }
          else if content.dynamicBackground {
              let (topColor, bottomColor) = content.view.snapshot().getDominantColors()
              return [
-                 Constants.InstaFBCommonURls.backroundTopColorURL: topColor,
-                 Constants.InstaFBCommonURls.backgroundBottomColorURL: bottomColor
+                 Constants.InstagramURLs.backroundTopColorURL: topColor,
+                 Constants.InstagramURLs.backgroundBottomColorURL: bottomColor
              ]
          }
          else if let videoURL = content.videoBackground {
              do {
                  let videoData = try Data(contentsOf: videoURL)
-                 return [Constants.InstaFBCommonURls.backgroundVideoURL: videoData]
+                 return [Constants.InstagramURLs.backgroundVideoURL: videoData]
              } catch {
                  throw ShareError.videoProcessingFailed
              }

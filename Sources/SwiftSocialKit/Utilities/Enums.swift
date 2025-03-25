@@ -22,7 +22,7 @@ public enum InstagramShareDestination {
         }
         
         guard let url = URL(string: urlSchemeString) else {
-            throw ShareError.cannotOpenInstagram
+            throw ShareError.cannotOpenApp
         }
         return url
     }
@@ -33,10 +33,46 @@ public enum InstagramShareDestination {
             break
         case .reels:
             if content.videoBackground == nil {
-                throw ShareError.invalidContentForReels
+                throw ShareError.invalidContentForPlatform
             }
             if content.background != nil || content.dynamicBackground {
-                throw ShareError.invalidContentForReels
+                throw ShareError.invalidContentForPlatform
+            }
+        }
+    }
+}
+
+@MainActor
+public enum FacebookShareDestination {
+    case stories
+    case reels
+    
+    func createURL(appID: String) throws -> URL {
+        let urlSchemeString: String
+        switch self {
+        case .stories:
+            urlSchemeString = "\(Constants.FacebookURLs.urlStoryScheme)\(appID)"
+        case .reels:
+            urlSchemeString = "\(Constants.FacebookURLs.urlReelScheme)\(appID)"
+        }
+        
+        guard let url = URL(string: urlSchemeString) else {
+            throw ShareError.cannotOpenApp
+        }
+        
+        return url
+    }
+    
+    func validateContent(_ content: ShareContent) throws {
+        switch self {
+        case .stories:
+            break
+        case .reels:
+            if content.videoBackground == nil {
+                throw ShareError.invalidContentForPlatform
+            }
+            if content.background != nil || content.dynamicBackground {
+                throw ShareError.invalidContentForPlatform
             }
         }
     }

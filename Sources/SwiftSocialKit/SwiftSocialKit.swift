@@ -28,6 +28,18 @@ public class SwiftSocialKit {
             }
         }
     }
+    
+    public func shareToFacebook(destination: FacebookShareDestination, storyContent: ShareContent, completion: @escaping (Bool) -> ()) {
+        FacebookShare(content: storyContent).share(destination: destination) { result in
+            switch result {
+            case .success:
+                completion(true)
+            case .failure(let error):
+                print(error.localizedDescription)
+                completion(false)
+            }
+        }
+    }
 }
 
 
